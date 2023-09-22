@@ -97,7 +97,7 @@ def scale_audio(audio):
 # Get configuration
 def get_config(f):
     with open(f,'r') as s:
-        return yaml.load(s)
+        return yaml.load(s,Loader=yaml.Loader)
 
 import matplotlib.pyplot as plt
 '''
