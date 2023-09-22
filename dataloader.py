@@ -1,4 +1,4 @@
-import wandb
+# import wandb
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -58,7 +58,7 @@ def get_files():
 # Get noise files used to generate mixtures
 def get_all_noise_files(dataset='BBC.16K',num_noise_files=1,city='London'):
     if dataset == 'BBC.16K': # use Ambience
-        root_dir = '/mnt/data/Sound Effects/BBC.16k'
+        root_dir = '/Users/revanth/Documents/btpDataSets/BBC'
         ambience_files = ['{}/{}'.format(root_dir,i) for i in os.listdir(root_dir) if i.startswith('Ambience'+city)] # Ambience
         random.shuffle(ambience_files)
         files = {}
@@ -80,7 +80,7 @@ class Daps(data.Dataset):
     '''
     def __init__(self,version,files,sr,clip_samples,pure_noise,flag):
         self.version = version
-        self.root_dir = '/mnt/data/daps/'
+        self.root_dir = '/Users/revanth/Documents/btpDataSets/daps/'
         self.files = files
         self.sr = sr 
         self.clip_samples = clip_samples
@@ -107,7 +107,7 @@ class Daps(data.Dataset):
             else: 
                 start = random.randint(START*fs,len(audio)-LEN*fs)
             # Resample the clip
-            clip = resample(audio[start:start+LEN*fs],fs,self.sr) / 1e5
+            clip = resample(audio[start:start+LEN*fs],orig_sr=fs,target_sr=self.sr) / 1e5
             # Thresholding: discard clip if the clip contains too much silence
             if not is_silence and np.sum(clip**2) < self.threshold:
                 continue
@@ -122,7 +122,7 @@ class Daps(data.Dataset):
                 if is_silence:
                     normalized_clean = torch.zeros(LEN*self.sr).float()
                 else:
-                    clip_clean = resample(audio_clean[start:start+LEN*fs],fs,self.sr)
+                    clip_clean = resample(audio_clean[start:start+LEN*fs],orig_sr=fs,target_sr=self.sr)
                     mu_clean, sigma_clean = np.mean(clip_clean), np.std(clip_clean)
                     normalized_clean = torch.from_numpy((clip_clean-mu_clean)/sigma_clean)
                 
@@ -140,7 +140,7 @@ import soundfile as sf
 # Dataset for custom noises
 class DapsNoise(data.Dataset):
     def __init__(self,clean_files,noise_files,sr,clip_samples,pure_noise,snr,flag):
-        self.clean_root_dir = '/mnt/data/daps/'
+        self.clean_root_dir = '/Users/revanth/Documents/btpDataSets/daps/'
         self.clean_files = clean_files
         self.noise_files = noise_files
         self.sr = sr
@@ -166,7 +166,7 @@ class DapsNoise(data.Dataset):
                     notnoise = 0
                 else: 
                     start = random.randint(START*fs,len(audio)-LEN*fs)
-                    clip = resample(audio[start:start+LEN*fs],fs,self.sr)/1e5
+                    clip = resample(audio[start:start+LEN*fs],orig_sr=fs,target_sr=self.sr)/1e5
 
                     if r >= self.pure_noise and np.sum(clip**2) < self.threshold and self.flag == 'train':
                         continue
@@ -183,7 +183,7 @@ class DapsNoise(data.Dataset):
                 # Randomly sample a clip of noise
                 if len(audio_noise) < LEN*fs: continue
                 start = random.randint(0,len(audio_noise)-LEN*fs)
-                clip_noise = resample(audio_noise[start:start+LEN*fs],fs,self.sr)
+                clip_noise = resample(audio_noise[start:start+LEN*fs],orig_sr=fs,target_sr=self.sr)
                 mu_noise, sigma_noise = np.mean(clip_noise), np.std(clip_noise)
                 normalized_noise = torch.from_numpy((clip_noise-mu_noise)/(sigma_noise+EPS))
                 

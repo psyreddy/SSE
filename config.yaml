@@ -1,5 +1,5 @@
 # Dataset options: true for BBC, false for DAPS
-urban_noise: true
+urban_noise: True
 
 # DAPS
 version_A: clean

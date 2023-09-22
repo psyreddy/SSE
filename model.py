@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-import wandb
+# import wandb
 from stft import *
 
 EPS = 1e-8 # Avoid numeric errors
@@ -87,11 +87,11 @@ class SSE(nn.Module):
         self.loss_kl_cyc_bab = self.config['cyc_kl_b_w']*self.__compute_kl(h_b_recon,notnoise=notnoise)
         self.loss_recon_latent_b = self.config['recon_latent_b_w']*self.recon_criterion(h_b_recon,h_b,notnoise=notnoise)
         # Log Losses
-        wandb.log({'recon_loss': self.loss_recon_b})
-        wandb.log({'recon_cyc_loss': self.loss_recon_cyc_b})
-        wandb.log({'latent_loss': self.loss_recon_latent_b})
-        wandb.log({'kl_loss': self.loss_kl_b+self.loss_kl_cyc_bab})
-        wandb.log({'cross_loss': self.loss_cross})
+        # wandb.log({'recon_loss': self.loss_recon_b})
+        # wandb.log({'recon_cyc_loss': self.loss_recon_cyc_b})
+        # wandb.log({'latent_loss': self.loss_recon_latent_b})
+        # wandb.log({'kl_loss': self.loss_kl_b+self.loss_kl_cyc_bab})
+        # wandb.log({'cross_loss': self.loss_cross})
         # Total loss
         self.loss = self.loss_recon_b + self.loss_kl_b + self.loss_recon_cyc_b + self.loss_kl_cyc_bab \
                                       + self.loss_recon_latent_b + self.loss_cross
